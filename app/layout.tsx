@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
- 
+import Context from "@/context/context";
 import "./globals.css"
 export const metadata: Metadata = {
   title: "HSgpt Ai",
@@ -13,9 +13,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
-        {children}
-      </body>
+      <Context>
+        <body>
+          {children}
+        </body>
+      </Context>
     </html>
   );
 }

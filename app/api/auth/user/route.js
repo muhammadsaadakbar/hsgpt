@@ -1,4 +1,4 @@
-import get_user from "@/lib/get-user";
+import get_user from "@/utils/get-user";
 import { NextResponse } from "next/server";
 export async function GET() {
   const user = await get_user()

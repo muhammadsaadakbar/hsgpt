@@ -1,7 +1,8 @@
 "use client"
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Paperclip, Sparkles, Image as ImageIcon, FileText, X, ChevronDown, Zap, Brain, Cpu, Menu, Plus } from 'lucide-react';
-
+import Profile from '@/components/profile';
+ import { Send, Paperclip, Sparkles, Image as ImageIcon, FileText, X, ChevronDown, Zap, Brain, Cpu, Menu, Plus } from 'lucide-react';
+import { useUser } from '@/context/user';
 interface Message {
   id: string;
   role: 'user' | 'assistant';
@@ -39,6 +40,7 @@ const models: Model[] = [
 ];
 
 export default function Page() {
+  const user = useUser();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -152,12 +154,7 @@ export default function Page() {
           </div>
         </div>
 
-        <div className="sidebar-footer">
-          <div className="user-profile">
-            <div className="user-avatar">HS</div>
-            <span className="user-name">User</span>
-          </div>
-        </div>
+        <Profile user={user}  />
       </aside>
 
       {/* Main Content */}

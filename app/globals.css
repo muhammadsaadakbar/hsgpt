@@ -215,45 +215,75 @@
    color: var(--text-inverse);
    font-weight: var(--fw-medium);
  }
-
+ 
  .sidebar-footer {
-   padding: 20px;
-   border-top: 1px solid var(--sidebar-border);
- }
+  padding: 16px;
+  border-top: 1px solid var(--border-light);
+  background: var(--bg-surface);
+}
 
- .user-profile {
-   display: flex;
-   align-items: center;
-   gap: 12px;
-   cursor: pointer;
-   padding: 8px;
-   border-radius: 8px;
-   transition: background 0.2s ease;
- }
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 14px;
+  transition: 0.2s ease;
+}
 
- .user-profile:hover {
-   background: var(--sidebar-hover);
- }
+.user-profile:hover {
+  background: var(--brand-accent-light);
+}
 
- .user-avatar {
-   width: 36px;
-   height: 36px;
-   border-radius: 50%;
-   background: linear-gradient(135deg, var(--brand-accent), #FF6B30);
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   color: var(--text-inverse);
-   font-weight: var(--fw-bold);
-   font-size: 14px;
-   flex-shrink: 0;
- }
+.user-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--brand-accent);
+  color: var(--text-inverse);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--fw-bold);
+  font-size: 15px;
+}
 
- .user-name {
-   color: var(--text-inverse);
-   font-weight: var(--fw-medium);
-   font-size: 14px;
- }
+.user-avatar.guest {
+  background: var(--border-light);
+  color: var(--text-secondary);
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.user-name {
+  font-weight: var(--fw-medium);
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.logout-btn {
+  margin-top: 2px;
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: 13px;
+  color: var(--brand-accent);
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.logout-btn:hover {
+  color: var(--brand-accent-hover);
+}
+
+.login-link {
+  text-decoration: none;
+}
+
 
  /* ============================================
    MOBILE HEADER
