@@ -1,7 +1,7 @@
 "use client"
 import React, { useState, useRef, useEffect } from 'react';
 import Profile from '@/components/profile';
- import { Send, Paperclip, Sparkles, Image as ImageIcon, FileText, X, ChevronDown, Zap, Brain, Cpu, Menu, Plus } from 'lucide-react';
+import { Send, Paperclip, Sparkles, Image as ImageIcon, FileText, X, ChevronDown, Zap, Brain, Cpu, Menu, Plus } from 'lucide-react';
 import { useUser } from '@/context/user';
 interface Message {
   id: string;
@@ -80,30 +80,102 @@ export default function Page() {
   const handleSend = async () => {
     if (!inputValue.trim() && selectedFiles.length === 0) return;
 
+    // Store files before clearing state
+    const filesToSend = [...selectedFiles];
+
+    // Create user message
     const newMessage: Message = {
       id: Date.now().toString(),
-      role: 'user',
+      role: "user",
       content: inputValue,
-      files: selectedFiles.length > 0 ? [...selectedFiles] : undefined,
-      timestamp: new Date()
+      files: filesToSend.length > 0 ? filesToSend : undefined,
+      timestamp: new Date(),
     };
 
-    setMessages(prev => [...prev, newMessage]);
-    setInputValue('');
+    // Add user message instantly
+    setMessages((prev) => [...prev, newMessage]);
+
+    // Clear input UI
+    setInputValue("");
     setSelectedFiles([]);
     setIsLoading(true);
 
-    // Simulate AI response
-    setTimeout(() => {
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: `I've received your message${selectedFiles.length > 0 ? ` with ${selectedFiles.length} file(s)` : ''}. This is a demo response from ${selectedModel.name}. In a real implementation, this would connect to your AI backend.`,
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, aiMessage]);
+    // Add placeholder assistant message (stream will fill this)
+    const assistantMessageId = (Date.now() + 1).toString();
+
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: assistantMessageId,
+        role: "assistant",
+        content: "",
+        timestamp: new Date(),
+      },
+    ]);
+
+    try {
+      // Send request to backend
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          messages: [
+            { role: "system", content: "You are a helpful AI assistant." },
+
+            // Send full chat history
+            ...messages.map((m) => ({
+              role: m.role,
+              content: m.content,
+            })),
+
+            // Add new user message
+            { role: "user", content: inputValue },
+          ],
+        }),
+      });
+
+      if (!res.body) throw new Error("No response stream found");
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+
+      let aiText = "";
+
+      // Stream response live
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+
+        aiText += decoder.decode(value);
+
+        // Update assistant message live
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === assistantMessageId
+              ? { ...msg, content: aiText }
+              : msg
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Chat Send Error:", error);
+
+      // Show error message in assistant bubble
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === assistantMessageId
+            ? {
+              ...msg,
+              content: "⚠️ Something went wrong. Please try again.",
+            }
+            : msg
+        )
+      );
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -136,25 +208,17 @@ export default function Page() {
             <Sparkles className="logo-icon" />
             <span className="logo-text">HSGPT</span>
           </div>
-          <button className="new-chat-btn">
+          <button onClick={()=>window.location.reload()} className="new-chat-btn">
             <Plus size={18} />
             <span>New Chat</span>
           </button>
         </div>
 
         <div className="sidebar-content">
-          <div className="chat-history">
-            <p className="history-label">Recent Chats</p>
-            <div className="history-item active">
-              <span>Current Conversation</span>
-            </div>
-            <div className="history-item">
-              <span>Previous Chat Example</span>
-            </div>
-          </div>
+   <p>Chat History Not Available For now.</p>
         </div>
 
-        <Profile user={user}  />
+        <Profile user={user} />
       </aside>
 
       {/* Main Content */}
@@ -205,7 +269,9 @@ export default function Page() {
                 <div key={message.id} className={`message ${message.role}`}>
                   <div className="message-avatar">
                     {message.role === 'assistant' ? (
+
                       <Sparkles size={20} />
+
                     ) : (
                       'U'
                     )}
